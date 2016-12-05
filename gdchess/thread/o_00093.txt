@@ -1,0 +1,1 @@
+('主题：哈哈 发现了一个好玩的新游戏哦 谁有兴趣跟我一起玩没？', [{'message': '<td class="inforight" valign="top" style="line-height:120%"><b style="font-size:12px;line-height:15px;">哈哈 发现了一个好玩的新游戏哦 谁有兴趣跟我一起玩没？</b>&#13;\n<br /><br />&#13;\n<div class="limitinfo">用户已被锁定</div><br /></td>&#13;\n', 'time': '2009-7-29 17:10:14', 'author': 'shuling233'}])

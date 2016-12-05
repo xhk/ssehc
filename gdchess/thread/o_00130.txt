@@ -1,0 +1,1 @@
+('主题：二十六个字母之“B”', [{'message': '<td class="inforight" valign="top" style="line-height:120%"><b style="font-size:12px;line-height:15px;">二十六个字母之“B”</b>&#13;\n<br /><br />&#13;\n<div class="limitinfo">用户已被锁定</div><br /></td>&#13;\n', 'time': '2009-9-9 8:37:14', 'author': '新棋迷'}])

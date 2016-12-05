@@ -1,0 +1,1 @@
+('主题：快过年了，说两句', [{'author': '新棋迷', 'message': '<td class="inforight" valign="top" style="line-height:120%"><b style="font-size:12px;line-height:15px;">快过年了，说两句</b>&#13;\n<br /><br />&#13;\n<div class="limitinfo">用户已被锁定</div><br /></td>&#13;\n', 'time': '2011-2-1 8:52:00'}])

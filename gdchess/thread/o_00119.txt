@@ -1,0 +1,1 @@
+('主题：棋力测试(红先)', [{'message': '<td class="inforight" valign="top" style="line-height:120%"><b style="font-size:12px;line-height:15px;">棋力测试(红先)</b>&#13;\n<br /><br />&#13;\n<div class="limitinfo">用户已被锁定</div><br /></td>&#13;\n', 'time': '2009-8-16 6:57:55', 'author': 'jjjjjabc123456'}])

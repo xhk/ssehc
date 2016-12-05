@@ -1,0 +1,1 @@
+('主题：咦！宠物跟财富恋爱了', [{'time': '2007-8-8 13:52:00', 'author': 'petdog129', 'message': '<td class="inforight" valign="top" style="line-height:120%"><b style="font-size:12px;line-height:15px;">咦！宠物跟财富恋爱了</b>&#13;\n<br /><br />&#13;\n<div class="limitinfo">内容被屏蔽</div><br /></td>&#13;\n'}])

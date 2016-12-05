@@ -1,0 +1,1 @@
+('主题：亚运“广州”', [{'author': '新棋迷', 'message': '<td class="inforight" valign="top" style="line-height:120%"><b style="font-size:12px;line-height:15px;">亚运“广州”</b>&#13;\n<br /><br />&#13;\n<div class="limitinfo">用户已被锁定</div><br /></td>&#13;\n', 'time': '2010-11-16 13:20:00'}])

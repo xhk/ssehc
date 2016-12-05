@@ -1,0 +1,1 @@
+('主题：群水镜山庄（85234081）梁山好汉群（85251379）梁山假武松的群', [{'time': '2009-4-20 17:34:49', 'message': '<td class="inforight" valign="top" style="line-height:120%"><b style="font-size:12px;line-height:15px;">群水镜山庄（85234081）梁山好汉群（85251379）梁山假武松的群</b>&#13;\n<br /><br />&#13;\n<div class="limitinfo">用户已被锁定</div><br /></td>&#13;\n', 'author': 'jjjjjabc123456'}])

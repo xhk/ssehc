@@ -1,0 +1,1 @@
+('主题：创业资源互助、共享信息尽在拼动网！', [{'time': '2007-1-11 11:20:00', 'author': 'pind0335', 'message': '<td class="inforight" valign="top" style="line-height:120%"><b style="font-size:12px;line-height:15px;">创业资源互助、共享信息尽在拼动网！</b>&#13;\n<br /><br />&#13;\n<div class="limitinfo">用户已被锁定</div><br /></td>&#13;\n'}])

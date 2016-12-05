@@ -1,0 +1,1 @@
+('主题：七星聚会象棋宣传部9月22日擂台赛对局欣赏', [{'message': '<td class="inforight" valign="top" style="line-height:120%"><b style="font-size:12px;line-height:15px;">七星聚会象棋宣传部9月22日擂台赛对局欣赏</b>&#13;\n<br /><br />&#13;\n<div class="limitinfo">用户已被锁定</div><br /></td>&#13;\n', 'time': '2009-9-23 0:28:51', 'author': '男女同灭'}])

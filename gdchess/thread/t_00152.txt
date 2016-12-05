@@ -1,0 +1,1 @@
+('主题：从“轨迹排局”想到“猫玩老鼠”', [{'author': '新棋迷', 'message': '<td class="inforight" valign="top" style="line-height:120%"><b style="font-size:12px;line-height:15px;">从“轨迹排局”想到“猫玩老鼠”</b>&#13;\n<br /><br />&#13;\n<div class="limitinfo">用户已被锁定</div><br /></td>&#13;\n', 'time': '2010-11-5 10:07:00'}])
