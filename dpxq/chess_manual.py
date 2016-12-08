@@ -78,18 +78,29 @@ def get_chess_manual(id):
         "hidden" 
     ]
     for tag in tags:
-        cm[tag] = re.search(r"\[DhtmlXQ_"+tag+"\]([^\b]*)\[\/DhtmlXQ_"+tag+"\]", dhtmlxq, re.I).group(1)
+        cm[tag] = re.search(r"\[DhtmlXQ_"+tag+"\]([^\[]*)\[\/DhtmlXQ_"+tag+"\]", dhtmlxq, re.I).group(1)
         cm[tag] = cm[tag].encode("utf8").decode('unicode-escape')
         #print()
     cm['movelist'] = move_list
     cm['dpid'] = id
+    cm['moves'] = ''
+    cm['comments'] = ''
+    m = re.findall(r"\[(DhtmlXQ_move_(\d+_\d+_\d+))\](\d{4}.*)\[\/\1\]", dhtmlxq, re.I);
+    for i in m:
+        cm['moves'] = cm['moves'] + "[DhtmlXQ_move_{0}]{1}[/DhtmlXQ_move_{0}]".fromat(i[1], i[2])
+    
+    m = re.findall(r"\[DhtmlXQ_comment(\d+_{0,1}\d*)\](.+)\[\/DhtmlXQ_comment\1\]", dhtmlxq, re.I)
+    for i in m:
+        cm['comments'] = cm['comments'] + "[DhtmlXQ_comment{0}]{1}[/DhtmlXQ_comment{0}]".format(i[0], i[1])
+    cm['comments'] = cm['comments'].encode("utf8").decode('unicode-escape')
+    
     fp = open("chess_manual/{0}.txt".format(id), "w", encoding="utf8")  
     fp.write(str(cm))
     fp.close()
     
     
 if __name__=='__main__':
-    #get_chess_manual(76262)
+    #get_chess_manual(71214)
     
     begin_page = int(sys.argv[1])
     end_page   = int(sys.argv[2])
@@ -104,6 +115,6 @@ if __name__=='__main__':
         for p in cmlist:
             print(p[0])
             get_chess_manual(p[0])
-            time.sleep(1)
+            #time.sleep(1)
         i = i + 1
     
