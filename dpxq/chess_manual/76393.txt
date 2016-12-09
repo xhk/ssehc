@@ -1,1 +1,15 @@
-{'ver': 'www_dpxq_com', 'hidden': '1', 'init': '500,350', 'date': '2016-11-30', 'class': '全国赛事', 'sortid': '763930', 'adddate': '2016-12-1 8:46:24', 'firstnum': '0', 'blacklevel': '大师', 'blackrating': '', 'blackname': '徐崇峰', 'oldowner': '轻舞飞扬2014', 'author': '轻舞飞扬2014', 'comments': '', 'redlevel': '特大', 'event': '2016磐安伟业杯象棋公开赛', 'length': '69', 'blackeng': '', 'blacktime': '', 'type': '全局', 'redname': '赵鑫鑫', 'dpid': 76393, 'round': '第10轮', 'judge': '', 'redeng': '', 'editdate': '2016-12-1 8:46:24', 'open': 'A39 飞相对进３卒', 'refer': 'www.dpxq.com', 'table': '第01台', 'timerule': '', 'price': '1', 'redtime': '', 'pver': '130606', 'gametype': '慢棋', 'title': '2016磐安公开赛 赵鑫鑫 胜 徐崇峰', 'place': '浙江磐安', 'movelist': '694723246665102279677082190720421727001009198081594881511915120215555131262524255525221425153135151614221610221089591031595402222737311277753531072630417573222473433136495972702605363343452420052670722634725254442024373324443383826159495253838453334515615334135332133241321513', 'endtype': '', 'red': '浙江 赵鑫鑫 (特大)', 'owner': '轻舞飞扬2014', 'redrating': '', 'record': '轻舞飞扬2014', 'binit': '', 'hits': '543', 'blackteam': '浙江', 'group': '', 'redteam': '浙江', 'result': '红胜', 'remark': '', 'moves': '', 'black': '浙江 徐崇峰 (大师)', 'other': '', 'viewurl': '?owner=m&amp;id=76393&amp;f=&amp;isSave='}
+{'ver': 'www_dpxq_com', 'hidden': '1', 'init': '500,350', 
+'date': '2016-11-30', 'class': '全国赛事', 'sortid': '763930', 
+'adddate': '2016-12-1 8:46:24', 'firstnum': '0', 'blacklevel': '大师', 'blackrating': '', 
+'blackname': '徐崇峰', 'oldowner': '轻舞飞扬2014', 'author': '轻舞飞扬2014', 'comments': '', 'redlevel': '特大', 
+'event': '2016磐安伟业杯象棋公开赛', 'length': '69', 'blackeng': '', 'blacktime': '', 
+'type': '全局', 'redname': '赵鑫鑫', 'dpid': 76393, 'round': '第10轮', 
+'judge': '', 'redeng': '', 'editdate': '2016-12-1 8:46:24', 
+'open': 'A39 飞相对进３卒', 'refer': 'www.dpxq.com', 'table': '第01台', 'timerule': '', 
+'price': '1', 'redtime': '', 'pver': '130606', 'gametype': '慢棋', 'title': '2016磐安公开赛 赵鑫鑫 胜 徐崇峰', 
+'place': '浙江磐安', 'movelist': '694723246665102279677082190720421727001009198081594881511915120215555131262524255525221425153135151614221610221089591031595402222737311277753531072630417573222473433136495972702605363343452420052670722634725254442024373324443383826159495253838453334515615334135332133241321513', 
+'endtype': '', 'red': '浙江 赵鑫鑫 (特大)', 
+'owner': '轻舞飞扬2014', 'redrating': '', 'record': '轻舞飞扬2014', 'binit': '', 
+'hits': '543', 'blackteam': '浙江', 'group': '', 
+'redteam': '浙江', 'result': '红胜', 
+'remark': '', 'moves': '', 'black': '浙江 徐崇峰 (大师)', 'other': '', 'viewurl': '?owner=m&amp;id=76393&amp;f=&amp;isSave='}
