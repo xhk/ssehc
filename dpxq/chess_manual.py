@@ -102,6 +102,11 @@ def get_chess_manual(id):
 if __name__=='__main__':
     #get_chess_manual(71214)
     
+    t = sys.argv[1]
+    if t=="id":
+        get_chess_manual(int(sys.argv[2]))
+        exit()
+    
     begin_page = int(sys.argv[1])
     end_page   = int(sys.argv[2])
     i = begin_page

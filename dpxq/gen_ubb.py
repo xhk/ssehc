@@ -1,4 +1,7 @@
 import sys
+import trans_cn_cm
+import pyperclip
+
 def gen_ubb(file):
     fp = open(file, 'r', encoding='utf8')
     c = fp.read()
@@ -88,8 +91,17 @@ def gen_ubb(file):
     d = d + '黑方团体: ' + c['blackteam'] + '\n'
     d = d + '黑方姓名: ' + c['blackname'] + '\n'
     d = d + '棋谱主人: ' + c['owner'] + '\n'
-    d = d + '来源网站: https://www.ichinachess.com/\n\n\n'
+    d = d + '来源网站: http://www.ichinachess.com/\n\n\n'
     
+    cm = trans_cn_cm.play_movelist(c['movelist'])
+    cm_count = len(cm)
+
+    for i in range(cm_count):
+        d = d + '%3d. %s  %s    ' % (i+1, cm[i][0], cm[i][1])
+        if ((i+1)%2)==0:
+            d = d +'\n'
+    d = d + '\n棋谱由 http://www.ichinachess.com/ 生成\n'       
+    d = d + '\n\n'
     d = d + "[DhtmlXQ]\n"
     for tag in tags:
         #d = d + "\\\\u005BDhtmlXQ_{0}]{1}\\\\u005B/DhtmlXQ_{0}]\n".format(tag, c[tag])
@@ -103,5 +115,7 @@ def gen_ubb(file):
 if __name__ == '__main__':
     id = sys.argv[1]
     t = gen_ubb('chess_manual/{0}.txt'.format(id))
-    print(t)
-    
+    # direct to clipboard
+    pyperclip.copy(t)
+    #print(t)
+  

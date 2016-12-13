@@ -1,7 +1,8 @@
 
 sid = '车马相士帅士相马车炮炮兵兵兵兵兵车马象士将士象马车炮炮卒卒卒卒卒'
 rindex = '一二三四五六七八九'
-bindex = '123456789'
+#bindex = '123456789'
+bindex = '１２３４５６７８９'
 
 directs2 = '前后'
 directs3 = '前中后'
@@ -26,12 +27,12 @@ def get_same_name_pos(id,name,fr):
             if sid[i]==name and fr[0]==cp[i][0] and cp[i][0]<9:
                 #print(sid[i])
                 pos_list.append(cp[i])
-        sorted(pos_list, key=lambda c:c[1], reverse=True)
+        pos_list = sorted(pos_list, key=lambda c:c[1], reverse=False)
     else:
         for i in range(16,32):
             if sid[i]==name and fr[0]==cp[i][0] and cp[i][0]<9:
                 pos_list.append(cp[i])
-        sorted(pos_list, key=lambda c:c[1], reverse = False)
+        pos_list = sorted(pos_list, key=lambda c:c[1], reverse = True)
     return pos_list
 
 def check_other_column_count_eg2(this_col, name):
@@ -82,7 +83,7 @@ def next(fr,to):
         elif fr[1]<to[1]:
             s[2] = '退'
             if fr[0]==to[0]: # 同一竖线
-                s[3] = rindex[to[1]-fr[1]]
+                s[3] = rindex[to[1]-fr[1]-1]
             else:
                 s[3] = rindex[8-to[0]]
                 
@@ -90,16 +91,19 @@ def next(fr,to):
         snpl_count = len(snpl)
         if snpl_count>1:
             order_index = 0
+            #print(snpl)
+            #print(fr)
             for k in range(snpl_count):
                 if snpl[k][1] == fr[1]:
                     order_index = k
+                    break
                 
             if snpl_count==2:
-                s[0] = directs2[k]
+                s[0] = directs2[order_index]
             elif snpl_count==3:
-                s[0] = directs3[k]
+                s[0] = directs3[order_index]
             else:
-                s[0] = directs3[k]
+                s[0] = directs3[order_index]
             
             
             s[1] = sid[id]    
@@ -136,16 +140,19 @@ def next(fr,to):
         snpl_count = len(snpl)
         if snpl_count>1:
             order_index = 0
+            #print(snpl)
+            #print(fr)
             for k in range(snpl_count):
                 if snpl[k][1] == fr[1]:
                     order_index = k
+                    break
             if snpl_count==2:
-                s[0] = directs2[k]
+                s[0] = directs2[order_index]
             elif snpl_count==3:
-                s[0] = directs3[k]
+                s[0] = directs3[order_index]
             else:
-                s[0] = directs3[k]
-            s[2] = sid[id]  
+                s[0] = directs3[order_index]
+            s[1] = sid[id]  
 
             if sid[id] == '卒':
                 # 检测其他列上是否有两个及以上的 兵
@@ -166,7 +173,7 @@ def play_movelist(ml):
     (8,9),(7,9),(6,9),(5,9),(4,9),(3,9),(2,9),(1,9),(0,9),(7,7),(1,7),(8,6),(6,6),(4,6),(2,6),(0,6),
     (0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,0),(7,0),(8,0),(1,2),(7,2),(0,3),(2,3),(4,3),(6,3),(8,3)
     ]
-    s = ''
+    s = []
     count = len(ml)
     round = int(count/8)
     for i in range(round):
@@ -181,11 +188,21 @@ def play_movelist(ml):
         to = (int(b[2]),int(b[3]))
         bs = next(fr,to)
         #print(rs + ' ' + bs )
-        s = s + '%3d. %s %s\n' % (i+1, rs, bs)
+        #s = s + '%3d. %s %s\n' % (i+1, rs, bs)
+        s.append((rs,bs))
+    if count%8==4:
+        r = ml[-4:]
+        #print(r)
+        fr = (int(r[0]),int(r[1]))
+        to = (int(r[2]),int(r[3]))
+        rs = next(fr,to)
+        s.append((rs,''))
+        
     return s
     
 if __name__ == '__main__':
     ml = '77376364796770622625100219278070090800012735121525242324082860423747304135436243474301218979727569472123434570731727233328184030594815132737304018143343450502101415757615454345464513156788767837387874454403047975040506051514383414188867102205041811666573713431413265647444754571314544316167756171647471727567726267556252444552547473223455673426451511211511214173832638'
+    ml = '7747706266658070796772821927232417131022132300100919121419156364262524251525646525656254655570748979746467755462552520424767627469471411677783847969643477871181696182866151304175548656544281874221403047695652698710145161526259483424252414242735242535542523546274626162'
     s = play_movelist(ml)
     print(s)
     
