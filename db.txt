@@ -1,7 +1,0 @@
-{
-'server':'localhost',
-'usr':'root',
-'pwd':'',
-'dbname':'',
-'pre':''
-}

@@ -57,9 +57,7 @@ class ChessPanal(Frame):
         self.starty = 50
         self.size_unit = 30
         self.guipieces = []
-        self.canvas = Canvas(self, width=400, height=600, bg='white')
-        self.canvas.create_rectangle(150,560,300,590,
-                                     fill='white', outline='')
+        self.canvas = Canvas(self, width=300, height=400, bg='white')
         self.canvas.bind('<ButtonPress-1>'  , self.leftButtonDown)
         self.canvas.bind('<ButtonRelease-1>', self.leftButtonUp)
         x = 0
@@ -72,42 +70,7 @@ class ChessPanal(Frame):
     def __init__(self, master=None):
         Frame.__init__(self, master)
         #self.pieces = []
-        self.pieces = [
-            PieceFactory.create(PieceType.tank,      Pos(8, 9), Side.red),
-            PieceFactory.create(PieceType.horse,     Pos(7, 9), Side.red),
-            PieceFactory.create(PieceType.minister,  Pos(6, 9), Side.red),
-            PieceFactory.create(PieceType.scholar,   Pos(5, 9), Side.red),
-            PieceFactory.create(PieceType.commander, Pos(4, 9), Side.red),
-            PieceFactory.create(PieceType.scholar,   Pos(3, 9), Side.red),
-            PieceFactory.create(PieceType.minister,  Pos(2, 9), Side.red),
-            PieceFactory.create(PieceType.horse,     Pos(1, 9), Side.red),
-            PieceFactory.create(PieceType.tank,      Pos(0, 9), Side.red),
-            #PieceFactory.create(PieceType.cannon,    Pos(7, 7), Side.red),
-            #PieceFactory.create(PieceType.cannon,    Pos(1, 7), Side.red),
-            #PieceFactory.create(PieceType.soldier,   Pos(0, 6), Side.red),
-            #PieceFactory.create(PieceType.soldier,   Pos(2, 6), Side.red),
-            #PieceFactory.create(PieceType.soldier,   Pos(4, 6), Side.red),
-            #PieceFactory.create(PieceType.soldier,   Pos(6, 6), Side.red),
-            #PieceFactory.create(PieceType.soldier,   Pos(8, 6), Side.red),
-            
-            PieceFactory.create(PieceType.tank,      Pos(8, 0), Side.black),
-            PieceFactory.create(PieceType.horse,     Pos(7, 0), Side.black),
-            PieceFactory.create(PieceType.minister,  Pos(6, 0), Side.black),
-            PieceFactory.create(PieceType.scholar,   Pos(5, 0), Side.black),
-            PieceFactory.create(PieceType.commander, Pos(4, 0), Side.black),
-            PieceFactory.create(PieceType.scholar,   Pos(3, 0), Side.black),
-            PieceFactory.create(PieceType.minister,  Pos(2, 0), Side.black),
-            PieceFactory.create(PieceType.horse,     Pos(1, 0), Side.black),
-            PieceFactory.create(PieceType.tank,      Pos(0, 0), Side.black),
-            #PieceFactory.create(PieceType.cannon,    Pos(7, 2), Side.black),
-            #PieceFactory.create(PieceType.cannon,    Pos(1, 2), Side.black),
-            #PieceFactory.create(PieceType.soldier,   Pos(0, 3), Side.black),
-            #PieceFactory.create(PieceType.soldier,   Pos(2, 3), Side.black),
-            #PieceFactory.create(PieceType.soldier,   Pos(4, 3), Side.black),
-            #PieceFactory.create(PieceType.soldier,   Pos(6, 3), Side.black),
-            #PieceFactory.create(PieceType.soldier,   Pos(8, 3), Side.black)
-            
-        ]
+        self.main_composition = Composition()
         
         
         
@@ -121,7 +84,7 @@ class ChessPanal(Frame):
         return c
     
     def drawPieces(self):
-        for p in self.pieces:
+        for p in self.main_composition.pieces:
             self.drawPiece(p)
     
     def drawPiece(self, piece):

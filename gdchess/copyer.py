@@ -1,10 +1,11 @@
 
 from pyquery import PyQuery as pq
 import re
-import gather
+import gather_ignore_img
 import sys,os
 sys.path.insert(0, '../ich')
 import DbHelper
+import forumthread
 
 new_thread_list_url = 'http://www.gdchess.com/bbs/index.asp?boardid=1'
 watch_record_file  = 'watch_record.txt'
@@ -41,7 +42,9 @@ class Copyer:
     
         db = eval(c)
         self.dh = DbHelper.DBHelper (db['server'], db['usr'], db['pwd'], db['dbname'], db['pre'])
-    
+        self.dh.connect()
+        self.ft = forumthread.ForumThread()
+        
     def save(self):
         fp = open('update_list.txt', 'w')
         if fp :
@@ -63,10 +66,11 @@ class Copyer:
     def update(self, boardid, postid, url):
         url = 'http://www.gdchess.com/bbs/dispbbs.asp?boardid={0}&ID={1}'.format(boardid, postid) 
         print(url)
-        subject,plist = gather.get_thread_post(url)
+        thread = gather_ignore_img.get_thread_post(url)
         fid = forum_mapping[boardid]
         author = '名侦探下棋'
-        self.dh.add_thread_posts(fid, author, 124, subject, plist)
+        nt = self.ft.getThread(thread,False)
+        self.dh.add_thread_posts(fid, author, 124, nt['subject'], nt['post_list'])
         self.dh.updateforum(fid)
         
         self.update_list[boardid] = postid
