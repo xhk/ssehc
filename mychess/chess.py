@@ -305,7 +305,9 @@ class Commander(Piece):
         
         if absdx==1 and absdy!=0:
             return False
-        
+        if p is None:
+            return True
+			
         return p.getSide()!=self.getSide()
         
 class Cannon(Piece):
