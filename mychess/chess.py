@@ -23,7 +23,8 @@ class Pos:
     def __init__(self,x=0,y=0):
         self.x = x
         self.y = y
-        
+    def __str__(self):
+        return '{0}{1}'.format(self.x, self.y)
 class Piece:
     red_names   = ['N', '车', '马', '相', '仕', '帅', '炮', '兵']
     black_names = ['N', '车', '马', '象', '士', '将', '砲', '卒']
@@ -38,7 +39,18 @@ class Piece:
             self.name = Piece.red_names[int(self.pt.value)]
         else:
             self.name = Piece.black_names[int(self.pt.value)]
+
+    def sameSizd(self, p):
+        return p.getSide() == self.rb
+
+    def isDie(self):
+        return self.pos.x == 9
+
+    def die(self):
+        self.pos.x = 9
+
         
+
     def CanMoveList(self):
         '''
         可落子点列表
@@ -46,7 +58,11 @@ class Piece:
         pass
     def isCanMove(self, pos):
         pass
-    
+
+    #  scored by position
+    def getScore(self):
+        pass
+
     def isMe(self, x, y):
         return self.pos.x == x and self.pos.y==y
         
@@ -70,7 +86,7 @@ class Tank(Piece):
     def isCanMove(self, pos):
         p = self.context.getPiece(pos.x, pos.y)
         if self.pos.x == pos.x: # on the same vertical line
-            if ( self.context.vertPieceCount(x, self.pos.y, pos.y) == 0 ):
+            if ( self.context.vertPieceCount(pos.x, self.pos.y, pos.y) == 0 ):
                 if p==None: # no piece in the end
                     return True
                 else :
@@ -79,7 +95,7 @@ class Tank(Piece):
                 return False
         
         elif self.pos.y == pos.y: # on the same horizontal line
-            if self.context.horzPieceCount(y, self.pos.x, pos.x)==0:
+            if self.context.horzPieceCount(pos.y, self.pos.x, pos.x)==0:
                 if p==None: # no piece in the end
                     return True
                 else:
@@ -90,10 +106,66 @@ class Tank(Piece):
             return False
         
         return False
+    
+    def getScore(self):
+        if self.isDie():
+            return 0
         
+        if self.pos.x is 3 or self.pos.x is 5:
+            return 6
+        return 5
+
+
+
+    def CanMoveList(self):
+        l = []
+        # left horz
+        for x in range(self.pos.x-1, -1, -1):
+            p = self.context.getPiece(x, self.pos.y)
+            if p is None:
+                l.append(Pos(x, self.pos.y))
+            else:
+                if p.getSide()==self.getSide():
+                    break
+                l.append(Pos(x, self.pos.y))
+        # right horz 
+        for x in range(self.pos.x+1, 9+1):
+            p = self.context.getPiece(x, self.pos.y)
+            if p is None:
+                l.append(Pos(x, self.pos.y))
+            else:
+                if p.getSide()==self.getSide():
+                    break
+                l.append(Pos(x, self.pos.y))
+
+        # up vertical
+        for y in range(self.pos.y-1, -1, -1):
+            p = self.context.getPiece(self.pos.x, y)
+            if p is None:
+                l.append(Pos(self.pos.x, y))
+            else:
+                if self.sameSide(p):
+                    break
+                l.append(Pos(self.pos.x, y))
+        # down vertical
+        for y in range(self.pos.y+1, 8+1, 1):
+            p = self.context.getPiece(Pos(self.pos.x, y))
+            if p is None:
+                l.append(Pos(self.pos.x, y))
+            else:
+                if self.sameSide(p):
+                    break
+                l.append(Pos(self.pos.x, y))
+        
+             
 class Horse(Piece):
     def __init__(self, pos, rb, context):
         Piece.__init__(self, PieceType.horse, pos, rb, context)
+    def getScore(self):
+        if self.isDie():
+            return 0
+        return 3
+
     def isCanMove(self, pos):
         p = self.context.getPiece(pos.x, pos.y)
         dx = pos.x-self.pos.x
@@ -122,12 +194,14 @@ class Horse(Piece):
                 return False
         elif dx==2:
             if dy==-1:
-                lame = (self.context.getPiece(self.pos.x+1, self.y)!=None)
+                lame = (self.context.getPiece(self.pos.x+1, self.pos.y)!=None)
             elif dy==1:
-                lame = (self.context.getPiece(self.pos.x+1, self.y)!=None)
+                lame = (self.context.getPiece(self.pos.x+1, self.pos.y)!=None)
             else:
                 return False
-        
+        else:
+            return False
+
         if lame :
             return False
         
@@ -140,6 +214,12 @@ class Horse(Piece):
 class Minister(Piece):
     def __init__(self, pos, rb, context):
         Piece.__init__(self, PieceType.minister, pos, rb, context)
+
+    def getScore(self):
+        if self.isDie():
+            return 0
+        return 2
+
     def isCanMove(self, pos):
         p = self.context.getPiece(pos.x, pos.y)
         
@@ -159,13 +239,21 @@ class Minister(Piece):
         if( lame_pos_piece != None):
             return False
         
+        if p is None:
+            return True
+
         return p.getSide()!=self.getSide()
             
         
 class Scholar(Piece):
     def __init__(self, pos, rb, context):
         Piece.__init__(self, PieceType.scholar, pos, rb, context)
-        
+    
+    def getScore(self):
+        if self.isDie():
+            return 0
+        return 3    
+    
     def isCanMove(self, pos):
         p = self.context.getPiece(pos.x, pos.y)
         
@@ -181,12 +269,19 @@ class Scholar(Piece):
         if self.rb == Side.black and pos.y>2:
             return False
         
+        if p is None:
+            return True
         return p.getSide()!=self.getSide()
             
 class Commander(Piece):
     def __init__(self, pos, rb, context):
         Piece.__init__(self, PieceType.commander, pos, rb, context)
-        
+
+    def getScore(self):
+        if self.isDie():
+            return 0
+        return 2
+    
     def isCanMove(self, pos):
         p = self.context.getPiece(pos.x, pos.y)
         
@@ -216,6 +311,12 @@ class Commander(Piece):
 class Cannon(Piece):
     def __init__(self, pos, rb, context):
         Piece.__init__(self, PieceType.cannon, pos, rb, context)
+
+    def getScore(self):
+        if self.isDie():
+            return 0
+        return 3
+
     def isCanMove(self, pos):
         p = self.context.getPiece(pos.x, pos.y)
         
@@ -227,7 +328,10 @@ class Cannon(Piece):
             if across_count == 0:
                 return p==None
             elif across_count==1:
-                return p.getSide()!=self.getSide() # eat or not
+                if p is None:
+                    return False
+                else:
+                    return p.getSide()!=self.getSide() # eat or not
             else:
                 return False
                 
@@ -244,6 +348,23 @@ class Cannon(Piece):
 class Pawn(Piece):
     def __init__(self, pos, rb, context):
         Piece.__init__(self, PieceType.soldier, pos, rb, context)        
+
+    def inPalace(self):
+        if self.rb == Side.red:
+            return self.pos.x>=3 and self.pos.x<= 5 and self.pos.y>=0 and self.pos.y<=2    
+        return self.pos.x>=3 and self.pos.x<= 5 and self.pos.y>=7 and self.pos.y<=9
+    
+    def getScore(self):
+        if self.isDie():
+            return 0
+        
+        across = self.isAcrossRiver()
+        if across :
+            if inPalace() : 
+                return 3
+            return 2
+        
+        return 1
     
     def isAcrossRiver(self):
         if self.rb == Side.red:
@@ -259,7 +380,7 @@ class Pawn(Piece):
         else:
             dy = pos.y - self.pos.y
         
-        if dy is not 0 or dy is not 1:
+        if not (dy>=0 and dy<=1):
             return False
         
         across = self.isAcrossRiver()
@@ -267,11 +388,19 @@ class Pawn(Piece):
             return False
         
         if across :
-            if (dx is 0) and (dy is not 1):
+            absx = abs(dx)
+            if dy is 0:
+                # absx must be 1
+                if absx is not 1:
+                    return False
+            elif dy is 1:
+                if absx is not 0:
+                    return False
+            else:
                 return False
-            if (dy is 0) and (abs(dx) is not 1):
-                return False
-                
+            
+        if p is None:
+            return True        
         return p.getSide() != self.getSide()
 class PieceFactory:
     def create(pt, pos, rb, context):
@@ -333,13 +462,22 @@ class Composition:
             PieceFactory.create(PieceType.soldier,   Pos(6, 3), Side.black, context),
             PieceFactory.create(PieceType.soldier,   Pos(8, 3), Side.black, context)
         ]
+        
+    def __str__(self):
+        s = 'composition\n'
+        for p in self.pieces:
+            s = s + str(p.getPos())
+        
+        return s
+        
     def vertPieceCount(self, x, y1, y2):
         r = 0
         step = 1
         if y1>y2:
             step = -1
+        y1 = y1+step
         for y in range(y1, y2, step):
-            for p in pieces:
+            for p in self.pieces:
                 if p.isMe(x,y):
                     r = r+1
                     break
@@ -350,15 +488,16 @@ class Composition:
         step = 1
         if x1>x2:
             step = -1
+        x1 = x1+step
         for x in range(x1, x2, step):
-            for p in pieces:
+            for p in self.pieces:
                 if p.isMe(x,y):
                     r = r + 1
                     break
         return r
 
     def getPiece(self, x, y):
-        for p in pieces:
+        for p in self.pieces:
             if p.isMe(x,y):
                 return p
         return None

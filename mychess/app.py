@@ -26,11 +26,24 @@ class GuiPiece:
         if y>(self.cp.starty + (yindex+1)*self.cp.size_unit-10):
             yindex = yindex + 1
         print('xindex={0},yindex={1}'.format(xindex,yindex))
+        
+        if not self.piece.isCanMove(Pos(xindex, yindex)):
+            return False
+        
+        p = None
+        for gp in self.cp.guipieces:
+            if gp.isIn(x, y) :
+                p = gp
+                break
+        if p is not None:
+            self.eat(p)
+
         self.piece.MoveTo(Pos(xindex,yindex))
         x = self.cp.startx + xindex*self.cp.size_unit
         y = self.cp.starty + yindex*self.cp.size_unit
         self.cp.canvas.coords(self.circle, x-10, y-10, x+10, y+10)
         self.cp.canvas.coords(self.text  , x, y)
+        return True
     
     def isIn(self, x,y):
         pos = self.piece.getPos()
@@ -43,6 +56,13 @@ class GuiPiece:
         self.cp.canvas.itemconfig(self.circle, outline="blue", width=2)
     def normal(self):
         self.cp.canvas.itemconfig(self.circle, outline="", width=1)
+    def hide(self):
+        self.cp.canvas.itemconfig(self.circle, state="hidden")
+        self.cp.canvas.itemconfig(self.text, state="hidden")
+
+    def eat(self, p):
+        p.piece.die()
+        p.hide()
 
 class ChessPanal(Frame):
     def createWidgets(self):
@@ -53,7 +73,7 @@ class ChessPanal(Frame):
         #self.name.pack(side=BOTTOM, fill=BOTH)
         #self.namev=StringVar()
         #self.name['textvariable'] = self.namev
-        self.startx = 50
+        self.startx = 30
         self.starty = 50
         self.size_unit = 30
         self.guipieces = []
@@ -111,6 +131,8 @@ class ChessPanal(Frame):
         x = self.startx 
         y = self.starty
         
+        self.canvas.create_line(x-4, y-3, x+width+4, y-3, x+width+4, y+height+4, x-4, y+height+4, x-3, y-3, width=2, fill='red')
+
         # draw the border
         self.canvas.create_line(x, y, x+width, y, x+width, y+height, x, y+height, x, y, width=1, fill='BLACK', tags='linex')
         
@@ -164,6 +186,7 @@ class ChessPanal(Frame):
             self.select_piece = None
     def leftButtonUp(self, event):
         print('mouse up')
+        print(self.main_composition)
         
 if __name__=='__main__':
     cp = ChessPanal()
