@@ -53,8 +53,11 @@ class GuiPiece:
         return x>xx-10 and x<xx+10 and y>yy-10 and y<yy+10
     
     def check(self):
-        self.cp.canvas.itemconfig(self.circle, outline="blue", width=2)
+        #print(str(self.piece.CanMoveList()))
+        self.cp.lightMoveTips(self.piece.CanMoveList())
+        self.cp.canvas.itemconfig(self.circle, outline="yellow", width=2)
     def normal(self):
+        self.cp.hideMoveTips()
         self.cp.canvas.itemconfig(self.circle, outline="", width=1)
     def hide(self):
         self.cp.canvas.itemconfig(self.circle, state="hidden")
@@ -84,6 +87,7 @@ class ChessPanal(Frame):
         self.line = self.canvas.create_line(x,563,x+50,563, width=1, fill='BLACK', tags='linex')
         self.drawPanel()
         self.drawPieces()
+        self.drawMoveTips()
         self.select_piece = None
         self.canvas.create_text(100, 10, text='Text', fill='red')
         self.canvas.pack(side=LEFT)
@@ -109,7 +113,6 @@ class ChessPanal(Frame):
     
     def drawPiece(self, piece):
         self.guipieces.append(GuiPiece(piece, self))
-
     def drawRiceShape(self, x, y):
         dot_list = [
         [x-5-2, y-2, x-2, y-2, x-2, y-5-2],
@@ -124,6 +127,21 @@ class ChessPanal(Frame):
             if l[0]>minx and l[0]<maxx:
                 self.canvas.create_line(l, width=1, fill='black')
     
+    def drawMoveTips(self):
+        self.mv_tips = []
+        for i in range(0, 10):
+            for j in range(0, 9):
+                c = self.index2Coorinate(Pos(j,i))
+                o = self.canvas.create_oval(c.x-4, c.y-4, c.x+4, c.y+4, fill="yellow", state="hidden")
+                self.mv_tips.append(o)
+    def hideMoveTips(self):
+        for o in self.mv_tips:
+            self.canvas.itemconfig(o, state="hidden")
+    def lightMoveTips(self, pos_list):
+        for p in pos_list:
+            self.canvas.itemconfig( self.mv_tips[p.x+9*p.y], state="normal")
+    
+
     def drawPanel(self):
         size_unit = 30
         width  = 8 * size_unit
@@ -171,6 +189,8 @@ class ChessPanal(Frame):
             c = self.index2Coorinate(r)
             self.drawRiceShape(c.x, c.y)
         
+        
+
     def leftButtonDown(self, event):
         print('{0},{1}'.format(event.x, event.y))
         if self.select_piece == None:
@@ -178,7 +198,6 @@ class ChessPanal(Frame):
                 if p.isIn(event.x, event.y):
                     self.select_piece = p
                     self.select_piece.check()
-                    #print('find')
                     break
         else:
             self.select_piece.move(event.x, event.y)

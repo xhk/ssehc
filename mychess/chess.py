@@ -1,4 +1,5 @@
 from enum import Enum
+import random
 
 # 棋子类型
 class PieceType(Enum):
@@ -25,6 +26,8 @@ class Pos:
         self.y = y
     def __str__(self):
         return '{0}{1}'.format(self.x, self.y)
+    def __repr__(self, **kwargs):
+        return self.__str__()
 class Piece:
     red_names   = ['N', '车', '马', '相', '仕', '帅', '炮', '兵']
     black_names = ['N', '车', '马', '象', '士', '将', '砲', '卒']
@@ -40,7 +43,7 @@ class Piece:
         else:
             self.name = Piece.black_names[int(self.pt.value)]
 
-    def sameSizd(self, p):
+    def sameSide(self, p):
         return p.getSide() == self.rb
 
     def isDie(self):
@@ -125,18 +128,19 @@ class Tank(Piece):
             if p is None:
                 l.append(Pos(x, self.pos.y))
             else:
-                if p.getSide()==self.getSide():
-                    break
-                l.append(Pos(x, self.pos.y))
+                if p.getSide()!=self.getSide():
+                    l.append(Pos(x, self.pos.y))
+                break
+
         # right horz 
-        for x in range(self.pos.x+1, 9+1):
+        for x in range(self.pos.x+1, 8+1):
             p = self.context.getPiece(x, self.pos.y)
             if p is None:
                 l.append(Pos(x, self.pos.y))
             else:
-                if p.getSide()==self.getSide():
-                    break
-                l.append(Pos(x, self.pos.y))
+                if p.getSide()!=self.getSide():
+                    l.append(Pos(x, self.pos.y))
+                break
 
         # up vertical
         for y in range(self.pos.y-1, -1, -1):
@@ -144,19 +148,19 @@ class Tank(Piece):
             if p is None:
                 l.append(Pos(self.pos.x, y))
             else:
-                if self.sameSide(p):
-                    break
-                l.append(Pos(self.pos.x, y))
+                if not self.sameSide(p):
+                    l.append(Pos(self.pos.x, y))
+                break
         # down vertical
-        for y in range(self.pos.y+1, 8+1, 1):
-            p = self.context.getPiece(Pos(self.pos.x, y))
+        for y in range(self.pos.y+1, 9+1, 1):
+            p = self.context.getPiece(self.pos.x, y)
             if p is None:
                 l.append(Pos(self.pos.x, y))
             else:
-                if self.sameSide(p):
-                    break
-                l.append(Pos(self.pos.x, y))
-        
+                if not self.sameSide(p):
+                    l.append(Pos(self.pos.x, y))
+                break
+        return l
              
 class Horse(Piece):
     def __init__(self, pos, rb, context):
@@ -165,6 +169,22 @@ class Horse(Piece):
         if self.isDie():
             return 0
         return 3
+    def CanMoveList(self):
+        l = []
+        ml = [
+        Pos(self.pos.x-2, self.pos.y-1),
+        Pos(self.pos.x-2, self.pos.y+1),
+        Pos(self.pos.x+2, self.pos.y-1),
+        Pos(self.pos.x+2, self.pos.y+1),
+        Pos(self.pos.x-1, self.pos.y-2),
+        Pos(self.pos.x-1, self.pos.y+2),
+        Pos(self.pos.x+1, self.pos.y-2),
+        Pos(self.pos.x+1, self.pos.y+2)
+        ]        
+        for m in ml:
+            if m.x>=0 and m.x<=8 and m.y>=0 and m.y<=9 and self.isCanMove(m):
+                l.append(m)
+        return l
 
     def isCanMove(self, pos):
         p = self.context.getPiece(pos.x, pos.y)
@@ -215,6 +235,19 @@ class Minister(Piece):
     def __init__(self, pos, rb, context):
         Piece.__init__(self, PieceType.minister, pos, rb, context)
 
+    def CanMoveList(self):
+        l = []
+        ml = [
+            Pos(self.pos.x-2, self.pos.y-2),
+            Pos(self.pos.x-2, self.pos.y+2),
+            Pos(self.pos.x+2, self.pos.y-2),
+            Pos(self.pos.x+2, self.pos.y+2)
+        ]
+        for m in ml:
+            if m.x>=0 and m.x<=8 and m.y>=0 and m.y<=9 and self.isCanMove(m):
+                l.append(m)
+        return l
+
     def getScore(self):
         if self.isDie():
             return 0
@@ -248,7 +281,25 @@ class Minister(Piece):
 class Scholar(Piece):
     def __init__(self, pos, rb, context):
         Piece.__init__(self, PieceType.scholar, pos, rb, context)
-    
+
+    def CanMoveList(self):
+        l = []
+        ml = []
+        # 在四个角的时候，只能往中心走
+        if self.pos.y is 0 or self.pos.y is 2 or self.pos.y is 7 or self.pos.y is 9:
+            ml = [Pos(4,1)]
+        elif self.pos.x is 4:
+            if self.rb == Side.red:
+                ml = [Pos(3,7), Pos(5,7), Pos(3,9), Pos(5,9)]
+            else:
+                ml = [Pos(3,0), Pos(5,0), Pos(3,2), Pos(5,2)]
+
+        for m in ml:
+            if self.isCanMove(m):
+                l.append(m)
+        return l    
+            
+
     def getScore(self):
         if self.isDie():
             return 0
@@ -276,6 +327,18 @@ class Scholar(Piece):
 class Commander(Piece):
     def __init__(self, pos, rb, context):
         Piece.__init__(self, PieceType.commander, pos, rb, context)
+    def CanMoveList(self):
+        l = []
+        ml = [
+             Pos(self.pos.x-1, self.pos.y), Pos(self.pos.x-1, self.pos.y),
+             Pos(self.pos.x, self.pos.y-1), Pos(self.pos.x, self.pos.y+1)
+        ]
+
+        for m in ml:
+            ym = m.y%7
+            if m.x>=3 and m.x<=5 and ym>=0 and ym<=2 and self.isCanMove(m):
+                l.append(m)
+        return l
 
     def getScore(self):
         if self.isDie():
@@ -307,12 +370,73 @@ class Commander(Piece):
             return False
         if p is None:
             return True
-			
         return p.getSide()!=self.getSide()
         
 class Cannon(Piece):
     def __init__(self, pos, rb, context):
         Piece.__init__(self, PieceType.cannon, pos, rb, context)
+
+    def CanMoveList(self):
+        l = []
+
+                 
+        # left x
+        have_shelf = False
+        for x in range(self.pos.x-1, -1, -1):
+            p = self.context.getPiece(x, self.pos.y)
+            if p is None:
+                if not have_shelf:
+                    l.append(Pos(x, self.pos.y))
+            else:
+                if have_shelf:
+                    if not self.sameSide(p):
+                        l.append(Pos(x, self.pos.y))
+                    break
+                else:
+                    have_shelf = True
+        # right x
+        have_shelf = False
+        for x in range(self.pos.x+1, 8+1):
+            p = self.context.getPiece(x, self.pos.y)
+            if p is None:
+                if not have_shelf:
+                    l.append(Pos(x, self.pos.y))
+            else:
+                if have_shelf:
+                    if not self.sameSide(p):
+                        l.append(Pos(x, self.pos.y))
+                    break
+                else:
+                    have_shelf = True
+        # up vertical
+        have_shelf = False
+        for y in range(self.pos.y-1, -1, -1):
+            p = self.context.getPiece(self.pos.x, y)
+            if p is None:
+                if not have_shelf:
+                    l.append(Pos(self.pos.x, y))
+            else:
+                if have_shelf:
+                    if not self.sameSide(p):
+                        l.append(Pos(self.pos.x, y))
+                    break
+                else:
+                    have_shelf = True
+        # down vertical
+        have_shelf = False
+        for y in range(self.pos.y+1, 9+1, 1):
+            p = self.context.getPiece(self.pos.x, y)
+            if p is None:
+                if not have_shelf:
+                    l.append(Pos(self.pos.x, y))
+            else:
+                if have_shelf:
+                    if not self.sameSide(p):
+                        l.append(Pos(self.pos.x, y))
+                    break
+                else:
+                    have_shelf = True
+        return l
 
     def getScore(self):
         if self.isDie():
@@ -350,6 +474,18 @@ class Cannon(Piece):
 class Pawn(Piece):
     def __init__(self, pos, rb, context):
         Piece.__init__(self, PieceType.soldier, pos, rb, context)        
+
+    def CanMoveList(self):
+        l = []
+        ml =[]
+        attack = 1
+        if self.rb == Side.red:
+            attack = -1
+        ml = [Pos(self.pos.x-1, self.pos.y),Pos(self.pos.x+1, self.pos.y), Pos(self.pos.x, self.pos.y+attack) ]
+        for m in ml:
+            if m.x>=0 and m.x<=8 and m.y>=0 and m.y<=9 and self.isCanMove(m):
+                l.append(m)
+        return l
 
     def inPalace(self):
         if self.rb == Side.red:
@@ -430,23 +566,6 @@ class Composition:
     def __init__(self):
         context = self
         self.pieces = [
-            PieceFactory.create(PieceType.tank,      Pos(8, 9), Side.red, context),
-            PieceFactory.create(PieceType.horse,     Pos(7, 9), Side.red, context),
-            PieceFactory.create(PieceType.minister,  Pos(6, 9), Side.red, context),
-            PieceFactory.create(PieceType.scholar,   Pos(5, 9), Side.red, context),
-            PieceFactory.create(PieceType.commander, Pos(4, 9), Side.red, context),
-            PieceFactory.create(PieceType.scholar,   Pos(3, 9), Side.red, context),
-            PieceFactory.create(PieceType.minister,  Pos(2, 9), Side.red, context),
-            PieceFactory.create(PieceType.horse,     Pos(1, 9), Side.red, context),
-            PieceFactory.create(PieceType.tank,      Pos(0, 9), Side.red, context),
-            PieceFactory.create(PieceType.cannon,    Pos(7, 7), Side.red, context),
-            PieceFactory.create(PieceType.cannon,    Pos(1, 7), Side.red, context),
-            PieceFactory.create(PieceType.soldier,   Pos(0, 6), Side.red, context),
-            PieceFactory.create(PieceType.soldier,   Pos(2, 6), Side.red, context),
-            PieceFactory.create(PieceType.soldier,   Pos(4, 6), Side.red, context),
-            PieceFactory.create(PieceType.soldier,   Pos(6, 6), Side.red, context),
-            PieceFactory.create(PieceType.soldier,   Pos(8, 6), Side.red, context),
-            
             PieceFactory.create(PieceType.tank,      Pos(8, 0), Side.black, context),
             PieceFactory.create(PieceType.horse,     Pos(7, 0), Side.black, context),
             PieceFactory.create(PieceType.minister,  Pos(6, 0), Side.black, context),
@@ -462,7 +581,25 @@ class Composition:
             PieceFactory.create(PieceType.soldier,   Pos(2, 3), Side.black, context),
             PieceFactory.create(PieceType.soldier,   Pos(4, 3), Side.black, context),
             PieceFactory.create(PieceType.soldier,   Pos(6, 3), Side.black, context),
-            PieceFactory.create(PieceType.soldier,   Pos(8, 3), Side.black, context)
+            PieceFactory.create(PieceType.soldier,   Pos(8, 3), Side.black, context),
+            PieceFactory.create(PieceType.tank,      Pos(8, 9), Side.red, context),
+            PieceFactory.create(PieceType.horse,     Pos(7, 9), Side.red, context),
+            PieceFactory.create(PieceType.minister,  Pos(6, 9), Side.red, context),
+            PieceFactory.create(PieceType.scholar,   Pos(5, 9), Side.red, context),
+            PieceFactory.create(PieceType.commander, Pos(4, 9), Side.red, context),
+            PieceFactory.create(PieceType.scholar,   Pos(3, 9), Side.red, context),
+            PieceFactory.create(PieceType.minister,  Pos(2, 9), Side.red, context),
+            PieceFactory.create(PieceType.horse,     Pos(1, 9), Side.red, context),
+            PieceFactory.create(PieceType.tank,      Pos(0, 9), Side.red, context),
+            PieceFactory.create(PieceType.cannon,    Pos(7, 7), Side.red, context),
+            PieceFactory.create(PieceType.cannon,    Pos(1, 7), Side.red, context),
+            PieceFactory.create(PieceType.soldier,   Pos(0, 6), Side.red, context),
+            PieceFactory.create(PieceType.soldier,   Pos(2, 6), Side.red, context),
+            PieceFactory.create(PieceType.soldier,   Pos(4, 6), Side.red, context),
+            PieceFactory.create(PieceType.soldier,   Pos(6, 6), Side.red, context),
+            PieceFactory.create(PieceType.soldier,   Pos(8, 6), Side.red, context)
+            
+            
         ]
         
     def __str__(self):
@@ -504,4 +641,37 @@ class Composition:
                 return p
         return None
     
+    def getScore(self, side):
+        score = 0
+        if side == Side.black:
+            for i in range(0, 16):
+                score = score + self.pieces[i].getScore()
+        else:
+            for i in range(16, 32):
+                score = score + self.pieces[i].getScore()
+        return score
+
+    def getMove(self, side):
+        live_list = []
+        if side == Side.black:
+            for i in range(0, 16):
+                if self.pieces[i].isDie():
+                    continue
+                live_list.append(self.pieces[i])
+        else:
+            for i in range(16, 32):
+                if self.pieces[i].isDie():
+                    continue
+                live_list.append(self.pieces[i])
+
+        live_count = len(live_list)
+        if live_count == 0:
+            return None
+        i = random.randint(0, live_count-1)
+        mv_list = live_list[i].move_list
+        mv_count = len(mv_list)
+        if mv_count==0:
+            return None
         
+        j = random.randint(0, mv_count-1)
+        return live_list[i],mv_list[j]
