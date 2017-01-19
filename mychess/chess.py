@@ -657,21 +657,19 @@ class Composition:
             for i in range(0, 16):
                 if self.pieces[i].isDie():
                     continue
-                live_list.append(self.pieces[i])
+                ml = self.pieces[i].CanMoveList()
+                for m in ml:
+                    live_list.append((self.pieces[i], m))
         else:
             for i in range(16, 32):
                 if self.pieces[i].isDie():
                     continue
-                live_list.append(self.pieces[i])
+                ml = self.pieces[i].CanMoveList()
+                for m in ml:
+                    live_list.append((self.pieces[i], m))
 
         live_count = len(live_list)
         if live_count == 0:
             return None
         i = random.randint(0, live_count-1)
-        mv_list = live_list[i].move_list
-        mv_count = len(mv_list)
-        if mv_count==0:
-            return None
-        
-        j = random.randint(0, mv_count-1)
-        return live_list[i],mv_list[j]
+        return live_list[i];

@@ -83,6 +83,7 @@ class ChessPanal(Frame):
         self.canvas = Canvas(self, width=300, height=400, bg='white')
         self.canvas.bind('<ButtonPress-1>'  , self.leftButtonDown)
         self.canvas.bind('<ButtonRelease-1>', self.leftButtonUp)
+        self.move_side = Side.red # 走子方 红先
         x = 0
         self.line = self.canvas.create_line(x,563,x+50,563, width=1, fill='BLACK', tags='linex')
         self.drawPanel()
@@ -189,7 +190,12 @@ class ChessPanal(Frame):
             c = self.index2Coorinate(r)
             self.drawRiceShape(c.x, c.y)
         
-        
+    def moveFromTo(self, fr, to):
+        for p in self.guipieces:
+            c = self.index2Coorinate(fr)
+            if p.isIn(c.x, c.y):
+                d = self.index2Coorinate(to)
+                p.move(d.x, d.y)
 
     def leftButtonDown(self, event):
         print('{0},{1}'.format(event.x, event.y))
@@ -203,6 +209,10 @@ class ChessPanal(Frame):
             self.select_piece.move(event.x, event.y)
             self.select_piece.normal()
             self.select_piece = None
+            mv = self.main_composition.getMove(Side.black)
+            if mv is not None:
+                self.moveFromTo(mv[0].getPos(), mv[1])
+
     def leftButtonUp(self, event):
         print('mouse up')
         print(self.main_composition)
