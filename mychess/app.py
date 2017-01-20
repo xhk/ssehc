@@ -52,6 +52,9 @@ class GuiPiece:
         #print('xx={0},yy={1}, pos.x={2}, pos.y={3}'.format(xx,yy, pos.x, pos.y))
         return x>xx-10 and x<xx+10 and y>yy-10 and y<yy+10
     
+    def isMe(self, pos):
+        return self.piece.isMe(pos.x, pos.y)
+
     def check(self):
         #print(str(self.piece.CanMoveList()))
         self.cp.lightMoveTips(self.piece.CanMoveList())
@@ -66,6 +69,31 @@ class GuiPiece:
     def eat(self, p):
         p.piece.die()
         p.hide()
+
+class MoveMark:
+    def __init__(self, cp, pos, color):
+        self.cp = cp
+        c = self.cp.index2Coorinate(pos)
+        self.left_top_line     = self.cp.canvas.create_line(c.x-12, c.y-7, c.x-12, c.y-12, c.x-7, c.y-12, width="1", fill=color, state="hidden")
+        self.left_bottom_line  = self.cp.canvas.create_line(c.x-12, c.y+7, c.x-12, c.y+12, c.x-7, c.y+12, width="1", fill=color, state="hidden")
+        self.right_top_line    = self.cp.canvas.create_line(c.x+12, c.y-7, c.x+12, c.y-12, c.x+7, c.y-12, width="1", fill=color, state="hidden")
+        self.right_bottom_line = self.cp.canvas.create_line(c.x+12, c.y+7, c.x+12, c.y+12, c.x+7, c.y+12, width="1", fill=color, state="hidden")
+    def show(self):
+        self.cp.canvas.itemconfig(self.left_top_line,     state="normal")
+        self.cp.canvas.itemconfig(self.left_bottom_line,  state="normal")
+        self.cp.canvas.itemconfig(self.right_top_line,    state="normal")
+        self.cp.canvas.itemconfig(self.right_bottom_line, state="normal")
+    def hide(self):
+        self.cp.canvas.itemconfig(self.left_top_line,     state="hidden")
+        self.cp.canvas.itemconfig(self.left_bottom_line,  state="hidden")
+        self.cp.canvas.itemconfig(self.right_top_line,    state="hidden")
+        self.cp.canvas.itemconfig(self.right_bottom_line, state="hidden")
+    def move(self, pos):
+        c = self.cp.index2Coorinate(pos)
+        self.cp.canvas.coords(self.left_top_line,    c.x-12, c.y-7, c.x-12, c.y-12, c.x-7, c.y-12) 
+        self.cp.canvas.coords(self.left_bottom_line, c.x-12, c.y+7, c.x-12, c.y+12, c.x-7, c.y+12)
+        self.cp.canvas.coords(self.right_top_line,   c.x+12, c.y-7, c.x+12, c.y-12, c.x+7, c.y-12)
+        self.cp.canvas.coords(self.right_bottom_line,c.x+12, c.y+7, c.x+12, c.y+12, c.x+7, c.y+12)
 
 class ChessPanal(Frame):
     def createWidgets(self):
@@ -89,15 +117,16 @@ class ChessPanal(Frame):
         self.drawPanel()
         self.drawPieces()
         self.drawMoveTips()
+        self.begin_mark = MoveMark(self, Pos(0, 0), 'blue')
+        self.end_mark   = MoveMark(self, Pos(0, 0), 'red')
         self.select_piece = None
         self.canvas.create_text(100, 10, text='Text', fill='red')
+
         self.canvas.pack(side=LEFT)
     def __init__(self, master=None):
         Frame.__init__(self, master)
         #self.pieces = []
         self.main_composition = Composition()
-        
-        
         
         Pack.config(self)
         self.createWidgets()
@@ -108,6 +137,30 @@ class ChessPanal(Frame):
         c.y = self.starty + (pos.y*self.size_unit)
         return c
     
+    def coorindate2Index(self, c):
+        p = Pos(-1,-1)
+        rx = c.x - self.startx
+        mx = rx % self.size_unit
+        xindex = int(rx/self.size_unit)
+        if mx>10 and mx<20:
+            return p
+        
+        ry = c.y-self.starty
+        my = ry%self.size_unit
+        yindex = int(ry/self.size_unit)
+
+        if my>10 and my<20:
+            return p
+
+        if mx>=20:
+            xindex = xindex+1
+        if my>=20:
+            yindex = yindex+1
+
+        p.x = xindex
+        p.y = yindex
+        return p
+
     def drawPieces(self):
         for p in self.main_composition.pieces:
             self.drawPiece(p)
@@ -196,22 +249,32 @@ class ChessPanal(Frame):
             if p.isIn(c.x, c.y):
                 d = self.index2Coorinate(to)
                 p.move(d.x, d.y)
+        self.begin_mark.show()
+        self.end_mark.show()
+        self.begin_mark.move(fr)
+        self.end_mark.move(to)
 
     def leftButtonDown(self, event):
         print('{0},{1}'.format(event.x, event.y))
+        pos = self.coorindate2Index(Pos(event.x, event.y))
+        if pos.x == -1:
+            return 
+
         if self.select_piece == None:
             for p in self.guipieces:
-                if p.isIn(event.x, event.y):
+                if p.isMe(pos):
                     self.select_piece = p
                     self.select_piece.check()
+                    
                     break
         else:
-            self.select_piece.move(event.x, event.y)
+            moved = self.select_piece.move(event.x, event.y)
             self.select_piece.normal()
             self.select_piece = None
-            mv = self.main_composition.getMove(Side.black)
-            if mv is not None:
-                self.moveFromTo(mv[0].getPos(), mv[1])
+            if moved:
+                mv = self.main_composition.getMove(Side.black)
+                if mv is not None:
+                    self.moveFromTo(mv[0].getPos(), mv[1])
 
     def leftButtonUp(self, event):
         print('mouse up')

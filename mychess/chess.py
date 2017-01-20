@@ -68,7 +68,8 @@ class Piece:
 
     def isMe(self, x, y):
         return self.pos.x == x and self.pos.y==y
-        
+    #def isMe(self, pos):
+    #    return self.pos.x == pos.x and self.pos.y==pos.y   
     def MoveTo(self, pos):
         '''
             落子
