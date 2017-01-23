@@ -136,9 +136,10 @@ class ChessPanal(Frame):
         self.begin_mark = MoveMark(self, Pos(0, 0), 'blue')
         self.end_mark   = MoveMark(self, Pos(0, 0), 'red')
         self.select_piece = None
-        self.canvas.create_text(100, 10, text='Text', fill='red')
+        #self.canvas.create_text(100, 10, text='Text', fill='red')
 
         self.canvas.pack(side=LEFT)
+
     def __init__(self, master=None):
         Frame.__init__(self, master)
         #self.pieces = []
