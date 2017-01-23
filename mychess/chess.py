@@ -14,11 +14,15 @@ class PieceType(Enum):
     
     
 '''
-    红、黑方
+ 
 ''' 
 class Side(Enum):
     red   = 1
     black = 2
+    def opposite(side):
+        if side == red:
+            return black
+        return red
 
 class Pos:
     def __init__(self,x=0,y=0):
@@ -28,6 +32,11 @@ class Pos:
         return '{0}{1}'.format(self.x, self.y)
     def __repr__(self, **kwargs):
         return self.__str__()
+    def __cmp__(self, pos):
+        dot = self.y*9+self.x
+        other = pos.y*9+pos.x
+        return dot-other
+
 class Piece:
     red_names   = ['N', '车', '马', '相', '仕', '帅', '炮', '兵']
     black_names = ['N', '车', '马', '象', '士', '将', '砲', '卒']
@@ -563,8 +572,16 @@ class PieceFactory:
         return None
 
 
+class Move:
+    def __init__(self, first, second=None, **kwargs):
+        self.first = first
+        self.second = second
+        return super().__init__(**kwargs)
+
+
 class Composition:
     def __init__(self):
+        self.move_list = []
         context = self
         self.pieces = [
             PieceFactory.create(PieceType.tank,      Pos(8, 0), Side.black, context),
@@ -652,7 +669,7 @@ class Composition:
                 score = score + self.pieces[i].getScore()
         return score
 
-    def getMove(self, side):
+    def getCanMoveList(self, side):
         live_list = []
         if side == Side.black:
             for i in range(0, 16):
@@ -668,9 +685,74 @@ class Composition:
                 ml = self.pieces[i].CanMoveList()
                 for m in ml:
                     live_list.append((self.pieces[i], m))
+        return live_list
 
+    def getMove(self, side):
+        live_list = self.getCanMoveList(side)
         live_count = len(live_list)
         if live_count == 0:
             return None
         i = random.randint(0, live_count-1)
         return live_list[i];
+
+    def getCommaner(self, side):
+        if side == Side.red:
+            return self.pieces[20];
+        return self.pieces[4];
+
+    def checked(self, side):
+        opp_side = Side.opposite(side)
+        opp_movelist = getCanMoveList(opp_side)
+        commander = getCommaner(side)
+        for m in opp_movelist:
+            if m[1].getPos() == commander.getPos():
+                return True
+        return False
+    def checkmated(self, side):
+        opp_side = Side.opposite(side)
+        opp_movelist = getCanMoveList(opp_side)
+        commander = getCommaner(side)
+        # move commander to avoid attck
+        for m in commander.CanMoveList():
+            find = False
+            for oppm in opp_movelist:
+                if m == oppm[1]:
+                    find = True
+                    break
+            
+            if not find:
+                return False
+
+        # move other to block attack
+
+        return True
+
+        
+    def moveTo(self, piece, pos):
+        if not piece.isCanMove(pos):
+            return False
+        eated_piece = None
+        for p in self.pieces:
+            if pos == p.getPos():
+                eated_piece = p
+                break
+        first = (piece, piece.getPos(), pos)
+        second = None
+        if eated_piece is not None:
+            second = (eated_piece, pos, Pos(9, pos.y))
+            eated_piece.die()
+
+        move = Move(first, second)  
+        self.move_list.append(move)
+        piece.MoveTo(pos)
+        
+        return True
+
+    def regret(self):
+        if len(self.move_list)==0:
+            return
+
+        move = self.move_list.pop()
+        move.first[0].MoveTo(move.first[1])
+        if move.second is not None:
+            move.second.MoveTo(move.second[1])

@@ -5,6 +5,7 @@ class GuiPiece:
     def __init__(self, piece, cp):
         self.piece = piece
         pos = piece.getPos()
+        self.pos = pos
         name = piece.getName()
         side = piece.getSide()
         self.cp = cp
@@ -65,6 +66,21 @@ class GuiPiece:
     def hide(self):
         self.cp.canvas.itemconfig(self.circle, state="hidden")
         self.cp.canvas.itemconfig(self.text, state="hidden")
+    def updateUI(self):
+        pos = self.piece.getPos()
+        if self.pos == pos:
+            return
+
+        if self.piece.isDie():
+            hide()
+            return
+
+        xindex = pos.x
+        yindex = pos.y
+        x = self.cp.startx + xindex*self.cp.size_unit
+        y = self.cp.starty + yindex*self.cp.size_unit
+        self.cp.canvas.coords(self.circle, x-10, y-10, x+10, y+10)
+        self.cp.canvas.coords(self.text  , x, y)
 
     def eat(self, p):
         p.piece.die()
@@ -115,7 +131,7 @@ class ChessPanal(Frame):
         x = 0
         self.line = self.canvas.create_line(x,563,x+50,563, width=1, fill='BLACK', tags='linex')
         self.drawPanel()
-        self.drawPieces()
+        self.createPieces()
         self.drawMoveTips()
         self.begin_mark = MoveMark(self, Pos(0, 0), 'blue')
         self.end_mark   = MoveMark(self, Pos(0, 0), 'red')
@@ -131,6 +147,10 @@ class ChessPanal(Frame):
         Pack.config(self)
         self.createWidgets()
     
+    def updateUI(self):
+        for gp in self.guipieces:
+            gp.updateUI()
+
     def index2Coorinate(self, pos):
         c = Pos()
         c.x = self.startx + (pos.x*self.size_unit)
@@ -161,11 +181,11 @@ class ChessPanal(Frame):
         p.y = yindex
         return p
 
-    def drawPieces(self):
+    def createPieces(self):
         for p in self.main_composition.pieces:
-            self.drawPiece(p)
+            self.createPiece(p)
     
-    def drawPiece(self, piece):
+    def createPiece(self, piece):
         self.guipieces.append(GuiPiece(piece, self))
     def drawRiceShape(self, x, y):
         dot_list = [
@@ -243,12 +263,9 @@ class ChessPanal(Frame):
             c = self.index2Coorinate(r)
             self.drawRiceShape(c.x, c.y)
         
-    def moveFromTo(self, fr, to):
-        for p in self.guipieces:
-            c = self.index2Coorinate(fr)
-            if p.isIn(c.x, c.y):
-                d = self.index2Coorinate(to)
-                p.move(d.x, d.y)
+    def moveFromTo(self, piece, to):
+        fr = piece.getPos()
+        self.main_composition.moveTo(piece, to)
         self.begin_mark.show()
         self.end_mark.show()
         self.begin_mark.move(fr)
@@ -268,13 +285,14 @@ class ChessPanal(Frame):
                     
                     break
         else:
-            moved = self.select_piece.move(event.x, event.y)
+            moved = self.main_composition.moveTo(self.select_piece.piece, pos)
             self.select_piece.normal()
             self.select_piece = None
             if moved:
                 mv = self.main_composition.getMove(Side.black)
                 if mv is not None:
-                    self.moveFromTo(mv[0].getPos(), mv[1])
+                    self.moveFromTo(mv[0], mv[1])
+            self.updateUI()
 
     def leftButtonUp(self, event):
         print('mouse up')
