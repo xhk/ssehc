@@ -33,9 +33,13 @@ class Pos:
     def __repr__(self, **kwargs):
         return self.__str__()
     def __cmp__(self, pos):
+        #print('__cmp__')
         dot = self.y*9+self.x
         other = pos.y*9+pos.x
         return dot-other
+    def __eq__(self, pos):
+        #print('__eq__')
+        return self.x == pos.x and self.y==pos.x
 
 class Piece:
     red_names   = ['N', '车', '马', '相', '仕', '帅', '炮', '兵']
@@ -584,17 +588,17 @@ class Composition:
         self.move_list = []
         context = self
         self.pieces = [
-            PieceFactory.create(PieceType.tank,      Pos(8, 0), Side.black, context),
-            PieceFactory.create(PieceType.horse,     Pos(7, 0), Side.black, context),
-            PieceFactory.create(PieceType.minister,  Pos(6, 0), Side.black, context),
-            PieceFactory.create(PieceType.scholar,   Pos(5, 0), Side.black, context),
-            PieceFactory.create(PieceType.commander, Pos(4, 0), Side.black, context),
-            PieceFactory.create(PieceType.scholar,   Pos(3, 0), Side.black, context),
-            PieceFactory.create(PieceType.minister,  Pos(2, 0), Side.black, context),
-            PieceFactory.create(PieceType.horse,     Pos(1, 0), Side.black, context),
             PieceFactory.create(PieceType.tank,      Pos(0, 0), Side.black, context),
-            PieceFactory.create(PieceType.cannon,    Pos(7, 2), Side.black, context),
+            PieceFactory.create(PieceType.horse,     Pos(1, 0), Side.black, context),
+            PieceFactory.create(PieceType.minister,  Pos(2, 0), Side.black, context),
+            PieceFactory.create(PieceType.scholar,   Pos(3, 0), Side.black, context),
+            PieceFactory.create(PieceType.commander, Pos(4, 0), Side.black, context),
+            PieceFactory.create(PieceType.scholar,   Pos(5, 0), Side.black, context),
+            PieceFactory.create(PieceType.minister,  Pos(6, 0), Side.black, context),
+            PieceFactory.create(PieceType.horse,     Pos(7, 0), Side.black, context),
+            PieceFactory.create(PieceType.tank,      Pos(8, 0), Side.black, context),
             PieceFactory.create(PieceType.cannon,    Pos(1, 2), Side.black, context),
+            PieceFactory.create(PieceType.cannon,    Pos(7, 2), Side.black, context),
             PieceFactory.create(PieceType.soldier,   Pos(0, 3), Side.black, context),
             PieceFactory.create(PieceType.soldier,   Pos(2, 3), Side.black, context),
             PieceFactory.create(PieceType.soldier,   Pos(4, 3), Side.black, context),
@@ -611,11 +615,11 @@ class Composition:
             PieceFactory.create(PieceType.tank,      Pos(0, 9), Side.red, context),
             PieceFactory.create(PieceType.cannon,    Pos(7, 7), Side.red, context),
             PieceFactory.create(PieceType.cannon,    Pos(1, 7), Side.red, context),
-            PieceFactory.create(PieceType.soldier,   Pos(0, 6), Side.red, context),
-            PieceFactory.create(PieceType.soldier,   Pos(2, 6), Side.red, context),
-            PieceFactory.create(PieceType.soldier,   Pos(4, 6), Side.red, context),
+            PieceFactory.create(PieceType.soldier,   Pos(8, 6), Side.red, context),
             PieceFactory.create(PieceType.soldier,   Pos(6, 6), Side.red, context),
-            PieceFactory.create(PieceType.soldier,   Pos(8, 6), Side.red, context)
+            PieceFactory.create(PieceType.soldier,   Pos(4, 6), Side.red, context),
+            PieceFactory.create(PieceType.soldier,   Pos(2, 6), Side.red, context),
+            PieceFactory.create(PieceType.soldier,   Pos(0, 6), Side.red, context)
             
             
         ]
@@ -729,11 +733,15 @@ class Composition:
 
         
     def moveTo(self, piece, pos):
+        print("moveTo:"+str(pos))
         if not piece.isCanMove(pos):
             return False
         eated_piece = None
         for p in self.pieces:
-            if pos == p.getPos():
+            #print(p.getPos())
+            the_pos = p.getPos()
+            if pos.x == the_pos.x and pos.y == the_pos.y:
+            #if pos == p.getPos():
                 eated_piece = p
                 break
         first = (piece, piece.getPos(), pos)

@@ -68,11 +68,11 @@ class GuiPiece:
         self.cp.canvas.itemconfig(self.text, state="hidden")
     def updateUI(self):
         pos = self.piece.getPos()
-        if self.pos == pos:
+        if self.pos.x == pos.y and self.pos.x == pos.y:
             return
 
         if self.piece.isDie():
-            hide()
+            self.hide()
             return
 
         xindex = pos.x
@@ -81,6 +81,7 @@ class GuiPiece:
         y = self.cp.starty + yindex*self.cp.size_unit
         self.cp.canvas.coords(self.circle, x-10, y-10, x+10, y+10)
         self.cp.canvas.coords(self.text  , x, y)
+        self.pos = pos
 
     def eat(self, p):
         p.piece.die()
