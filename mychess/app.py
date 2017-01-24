@@ -68,7 +68,7 @@ class GuiPiece:
         self.cp.canvas.itemconfig(self.text, state="hidden")
     def updateUI(self):
         pos = self.piece.getPos()
-        if self.pos.x == pos.y and self.pos.x == pos.y:
+        if self.pos.x == pos.x and self.pos.y == pos.y:
             return
 
         if self.piece.isDie():
@@ -174,9 +174,9 @@ class ChessPanal(Frame):
         if my>10 and my<20:
             return p
 
-        if mx>=20:
+        if mx>=20 and xindex>0:
             xindex = xindex+1
-        if my>=20:
+        if my>=20 and yindex>0:
             yindex = yindex+1
 
         p.x = xindex
@@ -274,8 +274,8 @@ class ChessPanal(Frame):
         self.end_mark.move(to)
 
     def leftButtonDown(self, event):
-        print('{0},{1}'.format(event.x, event.y))
         pos = self.coorindate2Index(Pos(event.x, event.y))
+        print('{0},{1}->{2},{3}'.format(event.x, event.y, pos.x, pos.y))
         if pos.x == -1:
             return 
 
