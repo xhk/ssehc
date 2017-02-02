@@ -5,7 +5,7 @@ class GuiPiece:
     def __init__(self, piece, cp):
         self.piece = piece
         pos = piece.getPos()
-        self.pos = pos
+        self.pos = Pos(pos.x, pos.y)
         name = piece.getName()
         side = piece.getSide()
         self.cp = cp
@@ -19,33 +19,6 @@ class GuiPiece:
         self.circle = cp.canvas.create_oval(x-10,y-10,x+10,y+10, fill=self.bgColor, width=1, stipple="gray25")
         self.text   = cp.canvas.create_text(x, y, text=name, fill='white', activefill='yellow')
         
-    def move(self, x,y):
-        xindex = int((x-self.cp.startx)/self.cp.size_unit)
-        yindex = int((y-self.cp.starty)/self.cp.size_unit)
-        if x>(self.cp.startx + (xindex+1)*self.cp.size_unit-10):
-            xindex = xindex+1
-        if y>(self.cp.starty + (yindex+1)*self.cp.size_unit-10):
-            yindex = yindex + 1
-        print('xindex={0},yindex={1}'.format(xindex,yindex))
-        
-        if not self.piece.isCanMove(Pos(xindex, yindex)):
-            return False
-        
-        p = None
-        for gp in self.cp.guipieces:
-            if gp.isIn(x, y) :
-                p = gp
-                break
-        if p is not None:
-            self.eat(p)
-
-        self.piece.MoveTo(Pos(xindex,yindex))
-        x = self.cp.startx + xindex*self.cp.size_unit
-        y = self.cp.starty + yindex*self.cp.size_unit
-        self.cp.canvas.coords(self.circle, x-10, y-10, x+10, y+10)
-        self.cp.canvas.coords(self.text  , x, y)
-        return True
-    
     def isIn(self, x,y):
         pos = self.piece.getPos()
         xx = self.cp.startx+pos.x*self.cp.size_unit
@@ -66,27 +39,35 @@ class GuiPiece:
     def hide(self):
         self.cp.canvas.itemconfig(self.circle, state="hidden")
         self.cp.canvas.itemconfig(self.text, state="hidden")
+    def show(self):
+        self.cp.canvas.itemconfig(self.circle, state="normal")
+        self.cp.canvas.itemconfig(self.text, state="normal")
+    
     def updateUI(self):
         pos = self.piece.getPos()
-        if self.pos.x == pos.x and self.pos.y == pos.y:
+        #print('{0},{1}'.format(self.pos, pos))
+        #if self.pos.x == pos.x and self.pos.y == pos.y:
+        if self.pos == pos:
             return
 
-        if self.piece.isDie():
-            self.hide()
-            return
-
+        self.pos.x = pos.x
+        self.pos.y = pos.y
+        
         xindex = pos.x
         yindex = pos.y
-        x = self.cp.startx + xindex*self.cp.size_unit
+            
+        if self.piece.isDie():
+            #print(self.piece.getName())
+            self.hide()
+            return
+        
+        #print(self.piece.getName())
+        x = self.cp.startx + xindex*self.cp.size_unit  
         y = self.cp.starty + yindex*self.cp.size_unit
         self.cp.canvas.coords(self.circle, x-10, y-10, x+10, y+10)
         self.cp.canvas.coords(self.text  , x, y)
-        self.pos = pos
-
-    def eat(self, p):
-        p.piece.die()
-        p.hide()
-
+        self.show()
+        
 class MoveMark:
     def __init__(self, cp, pos, color):
         self.cp = cp
@@ -117,6 +98,9 @@ class ChessPanal(Frame):
         self.QUIT = Button(self, text='QUIT', foreground='red',
                            command=self.quit)
         self.QUIT.pack(side=BOTTOM, fill=BOTH)
+        
+        self.regret_btn = Button(self, text="悔棋", command=self.regret)
+        self.regret_btn.pack(side=TOP)
         #self.name=Entry(self, width=60, fg='black')
         #self.name.pack(side=BOTTOM, fill=BOTH)
         #self.namev=StringVar()
@@ -148,6 +132,10 @@ class ChessPanal(Frame):
         
         Pack.config(self)
         self.createWidgets()
+    
+    def regret(self):
+        self.main_composition.regret()
+        self.updateUI()
     
     def updateUI(self):
         for gp in self.guipieces:
@@ -264,7 +252,12 @@ class ChessPanal(Frame):
         for r in rice_list:
             c = self.index2Coorinate(r)
             self.drawRiceShape(c.x, c.y)
-        
+    def guiPiecePosStr(self):
+        s = ''
+        for p in self.guipieces:
+            s = s + str(p.pos)
+        return s
+            
     def moveFromTo(self, piece, to):
         fr = piece.getPos()
         self.main_composition.moveTo(piece, to)
@@ -274,6 +267,9 @@ class ChessPanal(Frame):
         self.end_mark.move(to)
 
     def leftButtonDown(self, event):
+        print('mouse down1')
+        print(self.main_composition)
+        #print(self.guiPiecePosStr())
         pos = self.coorindate2Index(Pos(event.x, event.y))
         print('{0},{1}->{2},{3}'.format(event.x, event.y, pos.x, pos.y))
         if pos.x == -1:
@@ -295,10 +291,14 @@ class ChessPanal(Frame):
                 if mv is not None:
                     self.moveFromTo(mv[0], mv[1])
             self.updateUI()
-
+        print('mouse down2')
+        #print(self.main_composition)
+        print(self.guiPiecePosStr())
+        
     def leftButtonUp(self, event):
         print('mouse up')
-        print(self.main_composition)
+        #print(self.main_composition)
+        self.updateUI()
         
 if __name__=='__main__':
     cp = ChessPanal()

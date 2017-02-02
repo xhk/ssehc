@@ -39,8 +39,9 @@ class Pos:
         return dot-other
     def __eq__(self, pos):
         #print('__eq__')
-        return self.x == pos.x and self.y==pos.x
-
+        return self.x == pos.x and self.y==pos.y
+    def clone(self):
+        return Pos(self.x,self.y)
 class Piece:
     red_names   = ['N', '车', '马', '相', '仕', '帅', '炮', '兵']
     black_names = ['N', '车', '马', '象', '士', '将', '砲', '卒']
@@ -82,7 +83,7 @@ class Piece:
     def isMe(self, x, y):
         return self.pos.x == x and self.pos.y==y
     #def isMe(self, pos):
-    #    return self.pos.x == pos.x and self.pos.y==pos.y   
+    #    return self.pos.x == pos.x and self.pos.y==pos.y
     def MoveTo(self, pos):
         '''
             落子
@@ -90,6 +91,8 @@ class Piece:
         self.pos = pos
         self.move_list.append(pos)
         
+    def setPos(self, pos):
+        self.pos = pos
     def getPos(self):
         return self.pos
     def getName(self):
@@ -186,7 +189,7 @@ class Horse(Piece):
     def CanMoveList(self):
         l = []
         ml = [
-        Pos(self.pos.x-2, self.pos.y-1),
+            Pos(self.pos.x-2, self.pos.y-1),
         Pos(self.pos.x-2, self.pos.y+1),
         Pos(self.pos.x+2, self.pos.y-1),
         Pos(self.pos.x+2, self.pos.y+1),
@@ -585,6 +588,7 @@ class Move:
 
 class Composition:
     def __init__(self):
+        self.children = []
         self.move_list = []
         context = self
         self.pieces = [
@@ -628,9 +632,15 @@ class Composition:
         s = 'composition\n'
         for p in self.pieces:
             s = s + str(p.getPos())
+        s = s + "\nscroce: red-{0} black-{1}".format(self.getScore(Side.red), self.getScore(Side.black))
         
         return s
-        
+    
+    def cloneFrom(self, c):
+        piece_count = 32
+        for i in range(0,32):
+            self.pieces[i].setPos(c.pieces[i].getPos())
+    
     def vertPieceCount(self, x, y1, y2):
         r = 0
         step = 1
@@ -739,15 +749,15 @@ class Composition:
         eated_piece = None
         for p in self.pieces:
             #print(p.getPos())
-            the_pos = p.getPos()
-            if pos.x == the_pos.x and pos.y == the_pos.y:
-            #if pos == p.getPos():
+            #the_pos = p.getPos()
+            #if pos.x == the_pos.x and pos.y == the_pos.y:
+            if pos == p.getPos():
                 eated_piece = p
                 break
-        first = (piece, piece.getPos(), pos)
+        first = (piece, piece.getPos().clone(), pos.clone())
         second = None
         if eated_piece is not None:
-            second = (eated_piece, pos, Pos(9, pos.y))
+            second = (eated_piece, pos.clone(), Pos(9, pos.y))
             eated_piece.die()
 
         move = Move(first, second)  
@@ -763,4 +773,5 @@ class Composition:
         move = self.move_list.pop()
         move.first[0].MoveTo(move.first[1])
         if move.second is not None:
-            move.second.MoveTo(move.second[1])
+            move.second[0].MoveTo(move.second[1])
+            
