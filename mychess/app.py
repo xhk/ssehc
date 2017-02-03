@@ -1,5 +1,9 @@
 from tkinter import *
-from chess import *
+#from chess import *
+
+from Composition import Composition
+from base import *
+from Pos import Pos
 
 class GuiPiece:
     def __init__(self, piece, cp):
